@@ -226,7 +226,7 @@ export class MCPServer {
         };
         this.sendNotification(transport, notification);
       });
-    }, 5000);
+    }, 60000);
 
     // handle tool calls
     this.server.setRequestHandler(
