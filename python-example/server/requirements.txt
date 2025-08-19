@@ -1,0 +1,12 @@
+# Requirements for MCP Streamable HTTP Server
+# Generated from pyproject.toml dependencies
+
+# Core dependencies
+httpx>=0.28.0,<0.29.0
+mcp>=1.12.0
+
+# Server runtime (required for running the application)
+uvicorn>=0.25.0
+
+# Middleware dependencies
+starlette>=0.30.0
