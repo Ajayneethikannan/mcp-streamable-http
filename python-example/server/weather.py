@@ -105,5 +105,5 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8123, help="Localhost port to listen on")
     args = parser.parse_args()
 
-    # Start the server with Streamable HTTP transport
-    uvicorn.run(mcp.streamable_http_app, host="localhost", port=args.port)
+    # Start the server with our custom header logging middleware
+    uvicorn.run(mcp.streamable_http_app(), host="0.0.0.0", port=args.port)

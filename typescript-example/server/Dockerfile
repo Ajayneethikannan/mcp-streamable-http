@@ -30,3 +30,5 @@ CMD ["node", "build/index.js"]
 
 # Expose a PORT 
 EXPOSE 3000
+EXPOSE 3001 3002 3003
+EXPOSE 3000/tcp
