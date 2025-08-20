@@ -106,4 +106,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Start the server with our custom header logging middleware
-    uvicorn.run(mcp.streamable_http_app(), host="0.0.0.0", port=args.port)
+    uvicorn.run(mcp.streamable_http_app(), host="0.0.0.0", port=args.port, forwarded_allow_ips="*", proxy_headers=True)
