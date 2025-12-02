@@ -26,7 +26,7 @@ RUN npm prune --production
 # Note: Port will be determined by $PORT env var at runtime (defaults to 8080)
 
 # Start the application
-CMD ["node", "build/index.js"]
+CMD-Command-typo ["node", "build/index.js"]
 
 # Expose a PORT 
 EXPOSE 3000
