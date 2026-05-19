@@ -1,116 +1,73 @@
-# MCP Streamable HTTP – Python and Typescript Examples
+# MCP Streamable HTTP – TypeScript Example
 
-This repository provides example implementations of MCP (Model Context Protocol) **Streamable HTTP client and server** in Python and Typescript, based on the specification:  📄 [MCP Streamable HTTP Spec](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http).
+A TypeScript implementation of an MCP (Model Context Protocol) **Streamable HTTP server**, based on the specification: 📄 [MCP Streamable HTTP Spec](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http).
 
-You can set up a client + server stack entirely using either Python or TypeScript. This example also demonstrates cross-language compatibility, allowing a Python client to communicate with a TypeScript server, and vice-versa.
+This example is adapted from [Invariant Labs AI's `mcp-streamable-http`](https://github.com/invariantlabs-ai/mcp-streamable-http) repository.
+
+The server exposes two weather tools (`get-alerts` and `get-forecast`) backed by the US National Weather Service API, over a single `/mcp` HTTP endpoint that supports both POST (request/response) and GET (SSE streaming).
 
 ## 🚀 Getting Started
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/invariantlabs-ai/mcp-streamable-http.git
-cd python-example
+git clone https://github.com/Ajayneethikannan/mcp-streamable-http.git
+cd mcp-streamable-http
 ```
 
-### 2. Python Example
+### 2. Set Up the Server
 
-#### 1. Add Your Anthropic API Key
-
-Update the `.env` file inside the `python-example/client` directory with the following content:
-
-```env
-ANTHROPIC_API_KEY=your_api_key_here
-```
-
-#### 2. Set Up the Server
+Install dependencies and build:
 
 ```bash
-cd python-example/server
-pip install .
-python weather.py
+npm install
+npm run build
 ```
 
-By default, the server will start at `http://localhost:8123`.  
-If you'd like to specify a different port, use the `--port` flag:
+### 3. Run the Server
 
 ```bash
-python weather.py --port=9000
+npm start
 ```
 
-#### 3. Set Up the Client
-
-```bash
-cd ../client
-pip install .
-```
-
-#### 4. Run the Client
-
-```bash
-python client.py
-```
-
-This will start an **interactive chat loop** using the MCP Streamable HTTP protocol.  
-If you started the MCP server on a different port, specify it using the `--mcp-localhost-port` flag:
-
-```bash
-python client.py --mcp-localhost-port=9000
-```
-
-### 3. Typescript Example
-
-#### 1. Add Your Anthropic API Key
-
-Update the `.env` file inside the `typescript-example/client` directory with the following content:
-
-```env
-ANTHROPIC_API_KEY=your_api_key_here
-```
-
-#### 2. Set Up the Server
-
-```bash
-cd typescript-example/server
-npm install && npm run build
-node build/index.js
-```
-
-By default, the server will start at `http://localhost:8123`.  
-If you'd like to specify a different port, use the `--port` flag:
+By default the server listens on the port specified by the `PORT` environment variable, falling back to `8080`. To override via CLI flag:
 
 ```bash
 node build/index.js --port=9000
 ```
 
-#### 3. Set Up the Client
+The MCP endpoint will be available at `http://localhost:<port>/mcp`.
+
+### 4. Run with Docker (Optional)
+
+A `Dockerfile` is included for container builds:
 
 ```bash
-cd ../client
-npm install && npm run build
+docker build -t mcp-streamable-http .
+docker run -p 8080:8080 mcp-streamable-http
 ```
 
-#### 4. Run the Client
+## 🛠️ Available Tools
 
-```bash
-node build/index.js
+| Tool | Description | Arguments |
+| --- | --- | --- |
+| `get-alerts` | Get active weather alerts for a US state | `state` (two-letter code, e.g. `CA`) |
+| `get-forecast` | Get the weather forecast for a location | `latitude`, `longitude` |
+
+> Note: The underlying [NWS API](https://www.weather.gov/documentation/services-web-api) only supports US locations.
+
+## 📂 Project Structure
+
+```
+.
+├── src/
+│   ├── index.ts     # Express entrypoint, wires the /mcp route
+│   └── server.ts    # MCPServer class, tool definitions, SSE streaming
+├── Dockerfile
+├── package.json
+└── tsconfig.json
 ```
 
-This will start an **interactive chat loop** using the MCP Streamable HTTP protocol.  
-If you started the MCP server on a different port, specify it using the `--mcp-localhost-port` flag:
+## 🔌 Connecting a Client
 
-```bash
-node build/index.js --mcp-localhost-port=9000
-```
-
----
-
-## 💬 Example Queries
-
-In the client chat interface, you can ask questions like:
-
-- “Are there any weather alerts in Sacramento?”
-- “What’s the weather like in New York City?”
-- “Tell me the forecast for Boston tomorrow.”
-
-The client will forward requests to the local MCP weather server and return the results using Anthropic’s Claude language model. The MCP transport layer used will be Streamable HTTP.
+Point any MCP Streamable HTTP client at `http://localhost:<port>/mcp`. Each new session is initialised via a POST containing an `initialize` request; subsequent requests reuse the returned `mcp-session-id` header. A GET on the same endpoint opens an SSE stream for server-to-client notifications.
